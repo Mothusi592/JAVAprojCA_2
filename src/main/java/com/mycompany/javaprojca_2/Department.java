@@ -8,22 +8,21 @@ package com.mycompany.javaprojca_2;
  *
  * @author gondo
  */
-public class Manager {
+public class Department {
     
-    private String managerType;
+    private String deptName;
 
-    public Manager(String managerType) {
-        this.managerType = managerType;
+    public Department(String deptName) {
+        this.deptName = deptName;
     }
 
-    public String getManagerType() {
-        return managerType;
+    public String getDeptName() {
+        return deptName;
     }
 
     @Override
     public String toString() {
-        return managerType;
+        return deptName;
     }
 }
-            
-
+    
