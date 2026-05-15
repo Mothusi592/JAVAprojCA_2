@@ -10,4 +10,5 @@ package com.mycompany.javaprojca_2;
  */
 public class Manager {
     
+                
 }
