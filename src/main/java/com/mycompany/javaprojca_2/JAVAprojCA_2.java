@@ -11,6 +11,5 @@ package com.mycompany.javaprojca_2;
 public class JAVAprojCA_2 {
 
     public static void main(String[] args) {
-        System.out.println("Hello World!");
     }
 }
