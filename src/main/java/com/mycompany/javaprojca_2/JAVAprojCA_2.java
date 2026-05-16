@@ -14,23 +14,10 @@ import java.util.Scanner;
  * @author gondo
  */
 public class JAVAprojCA_2 { 
-static List<String> applicants = new ArrayList<>();
+    
+    static List<String> applicants = new ArrayList<>();
     static List<Employee> employees = new ArrayList<>();
     static Scanner input = new Scanner(System.in);
-
-    static String[] managerTypes = {
-        "Senior Manager",
-        "Assistant Manager",
-        "Team Lead"
-    };
-
-    static String[] departments = {
-        "Customer Service",
-        "Foreign Exchange",
-        "Loans",
-        "Credit Department",
-        "HR"
-    };
 
     public static void main(String[] args) {
 
@@ -41,7 +28,6 @@ static List<String> applicants = new ArrayList<>();
         do {
             System.out.println("\n===== BANK MANAGEMENT MENU =====");
 
-            // ENUM‑based menu (assignment requirement)
             for (MenuOption m : MenuOption.values()) {
                 System.out.println((m.ordinal() + 1) + ". " + m.getLabel());
             }
@@ -73,7 +59,10 @@ static List<String> applicants = new ArrayList<>();
             Scanner reader = new Scanner(file);
 
             while (reader.hasNextLine()) {
-                applicants.add(reader.nextLine().trim());
+                String line = reader.nextLine().trim();
+                if (!line.isEmpty()) {
+                    applicants.add(line);
+                }
             }
 
             System.out.println("File read successfully.");
@@ -84,7 +73,12 @@ static List<String> applicants = new ArrayList<>();
     }
 
     private static void sortApplicants() {
-        applicants = MergeSort.sort(applicants);
+        if (applicants.isEmpty()) {
+            System.out.println("No applicants loaded.");
+            return;
+        }
+
+        applicants = MergeSort.sort(applicants); // see signature note below
 
         System.out.println("\nFirst 20 sorted names:");
         applicants.stream().limit(20).forEach(System.out::println);
@@ -96,7 +90,6 @@ static List<String> applicants = new ArrayList<>();
             return;
         }
 
-        // Ensure list is sorted before searching
         applicants = MergeSort.sort(applicants);
 
         System.out.print("Enter name to search: ");
@@ -116,24 +109,46 @@ static List<String> applicants = new ArrayList<>();
         String name = input.nextLine();
 
         System.out.println("Select Manager Type:");
-        for (int i = 0; i < managerTypes.length; i++)
-            System.out.println((i + 1) + ". " + managerTypes[i]);
-        int mChoice = getIntInput();
-        Manager manager = new Manager(managerTypes[mChoice - 1]);
+        Manager[] managers = Manager.values();
+        for (int i = 0; i < managers.length; i++) {
+            System.out.println((i + 1) + ". " + managers[i]);
+        }
+
+        int mChoice;
+        while (true) {
+            mChoice = getIntInput();
+            if (mChoice >= 1 && mChoice <= managers.length) break;
+            System.out.println("Invalid choice. Try again.");
+        }
+        Manager manager = managers[mChoice - 1];
 
         System.out.println("Select Department:");
-        for (int i = 0; i < departments.length; i++)
-            System.out.println((i + 1) + ". " + departments[i]);
-        int dChoice = getIntInput();
-        Department dept = new Department(departments[dChoice - 1]);
+        Department[] deps = Department.values();
+        for (int i = 0; i < deps.length; i++) {
+            System.out.println((i + 1) + ". " + deps[i]);
+        }
+
+        int dChoice;
+        while (true) {
+            dChoice = getIntInput();
+            if (dChoice >= 1 && dChoice <= deps.length) break;
+            System.out.println("Invalid choice. Try again.");
+        }
+        Department dept = deps[dChoice - 1];
 
         Employee emp = new Employee(name, manager, dept);
         employees.add(emp);
 
         System.out.println("\n" + name + " added successfully!");
+        System.out.println(emp);
     }
 
     private static void buildTree() {
+        if (employees.size() < 20) {
+            System.out.println("You need at least 20 employees to build the tree.");
+            return;
+        }
+
         EmployeeTree tree = new EmployeeTree();
 
         for (Employee e : employees) {
@@ -141,7 +156,7 @@ static List<String> applicants = new ArrayList<>();
         }
 
         System.out.println("\n===== EMPLOYEE HIERARCHY (LEVEL ORDER) =====");
-        tree.displayLevelOrder();
+        tree.displayLevelOrder(); // ensure method name matches in EmployeeTree
     }
 
     private static int getIntInput() {
