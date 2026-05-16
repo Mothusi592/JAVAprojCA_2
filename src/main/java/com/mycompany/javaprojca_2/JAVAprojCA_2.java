@@ -53,29 +53,38 @@ public class JAVAprojCA_2 {
     }
 
     // -----------------------------
-    // LOAD APPLICANTS (FIRST + LAST NAME ONLY)
+    // LOAD APPLICANTS (FIRST + LAST NAME,MANAGER TYPE AND DEPARTMENT)
     // -----------------------------
     private static void loadApplicants() {
-        try {
-            File file = new File("Applicants_Form.txt");
-            Scanner reader = new Scanner(file);
+           try {
+        File file = new File("Applicants_Form.txt");
+        Scanner reader = new Scanner(file);
 
-            while (reader.hasNextLine()) {
-                String line = reader.nextLine().trim();
-                if (line.isEmpty()) continue;
+        boolean isFirstLine = true;
 
-                String[] parts = line.split(",");
-                String fullName = parts[0].trim() + " " + parts[1].trim();
+        while (reader.hasNextLine()) {
+            String line = reader.nextLine().trim();
+            if (line.isEmpty()) continue;
 
-                applicants.add(fullName);
+            // Skip header row
+            if (isFirstLine) {
+                isFirstLine = false;
+                continue;
             }
 
-            System.out.println("Applicants loaded successfully.");
+            String[] parts = line.split(",");
+            if (parts.length < 2) continue;
 
-        } catch (Exception e) {
-            System.out.println("Error reading file.");
+            String fullName = parts[0].trim() + " " + parts[1].trim();
+            applicants.add(fullName);
         }
+
+        System.out.println("Applicants loaded successfully.");
+
+    } catch (Exception e) {
+        System.out.println("Error reading file.");
     }
+}
 
     // -----------------------------
     // SORT APPLICANTS + DISPLAY CLEAN OUTPUT
@@ -103,25 +112,36 @@ public class JAVAprojCA_2 {
     // -----------------------------
     // SEARCH APPLICANT
     // -----------------------------
-    private static void searchApplicant() {
-        if (applicants.isEmpty()) {
-            System.out.println("No applicants loaded.");
+   private static void searchApplicant() {
+
+    System.out.print("Enter name to search: ");
+    String name = input.nextLine().trim();
+
+    // 1. Search applicants (sorted list)
+    applicants = MergeSort.sort(applicants);
+    int index = BinarySearch.search(applicants, name, 0, applicants.size() - 1);
+
+    if (index != -1) {
+        System.out.println("\nFound in applicants:");
+        System.out.println(applicants.get(index));
+        return;
+    }
+
+    // 2. Search employees (manually added or tree-generated)
+    for (Employee e : employees) {
+        if (e.getName().equalsIgnoreCase(name)) {
+            System.out.println("\nFound in employees:");
+            System.out.println(
+                e.getName() + " | " +
+                e.getManagerType() + " | " +
+                e.getDepartment()
+            );
             return;
         }
-
-        applicants = MergeSort.sort(applicants);
-
-        System.out.print("Enter name to search: ");
-        String name = input.nextLine();
-
-        int index = BinarySearch.search(applicants, name, 0, applicants.size() - 1);
-
-        if (index == -1) {
-            System.out.println("Name not found.");
-        } else {
-            System.out.println("Found: " + applicants.get(index));
-        }
     }
+
+    System.out.println("\nName not found.");
+}
 
     // -----------------------------
     // ADD EMPLOYEE MANUALLY
