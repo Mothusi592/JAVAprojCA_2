@@ -162,9 +162,22 @@ private static void searchName(String name) {
     // ADD EMPLOYEE MANUALLY
     // -----------------------------
     private static void addEmployee() {
+        String name;
+        
+        while(true){
         System.out.print("Enter employee name: ");
-        String name = input.nextLine();
-
+        String nameInput = input.nextLine();
+        if (nameInput.isEmpty()) {
+            System.out.println("Name cannot be empty.");
+            continue;
+        }
+        if(!nameInput.matches("[A-Za-z ]+")) {
+            System.out.println("Invalid name. Only letters and spaces allowed.");
+            continue;
+        }
+        name = nameInput;
+        break;
+        }
         System.out.println("Select Manager Type:");
         Manager[] managers = Manager.values();
         for (int i = 0; i < managers.length; i++) {
@@ -172,21 +185,28 @@ private static void searchName(String name) {
         }
         int mChoice = getValidatedChoice(managers.length);
         Manager manager = managers[mChoice - 1];
-
+        
+        Department dept;
+        if(manager == Manager.CEO){
+            dept = Department.NONE;
+            System.out.println("\nCEO does not require a department");
+        }else{
         System.out.println("Select Department:");
         Department[] deps = Department.values();
         for (int i = 0; i < deps.length; i++) {
             System.out.println((i + 1) + ". " + deps[i]);
         }
         int dChoice = getValidatedChoice(deps.length);
-        Department dept = deps[dChoice - 1];
-
+         dept = deps[dChoice - 1];
+        }
+        
         Employee emp = new Employee(name, manager, dept);
         employees.add(emp);
 
         System.out.println("\nEmployee added:");
         System.out.println(emp);
     }
+  
 private static void searchEmployee() {
 
     if (employees.isEmpty()) {
