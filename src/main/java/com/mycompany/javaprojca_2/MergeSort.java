@@ -11,6 +11,12 @@ import java.util.List;
  *
  * @author gondo
  */
+/**This is a recursive Merge Sort for the list of Employees
+ * Merge sort  is the best in this case because it gives O(n log n), this is best compared to other
+ sorting algorithms
+ * in cases where Employee name are relative the same, the are kept in their original relative order, ensuring STABILITY
+ *Works on divide and conquer
+ */
 public class MergeSort {
     // Public method to sort a list of names
     public static List<String> sort(List<String> list) {
@@ -28,7 +34,7 @@ public class MergeSort {
         return merge(left, right);
     }
 
-    // Merge two sorted lists
+    // This merges two sorted lists
     private static List<String> merge(List<String> left, List<String> right) {
         List<String> result = new ArrayList<>();
 
@@ -45,7 +51,7 @@ public class MergeSort {
             }
         }
 
-        // Add remaining elements
+        // Adds remaining name elements
         while (i < left.size()) {
             result.add(left.get(i));
             i++;
