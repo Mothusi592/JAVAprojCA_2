@@ -45,6 +45,7 @@ public class JAVAprojCA_2 {
                 case SORT -> sortApplicants();
                 case SEARCH -> searchApplicant();
                 case ADD_RECORD -> addEmployee();
+                case SEARCH_EMPLOYEE -> searchEmployee();
                 case CREATE_BINARY_TREE -> buildTree();
                 case EXIT -> System.out.println("Exiting...");
             }
@@ -113,20 +114,34 @@ public class JAVAprojCA_2 {
     // SEARCH APPLICANT
     // -----------------------------
    private static void searchApplicant() {
+       
+   if (input.hasNextLine()) {
+            String leftover = input.nextLine();
+            if (!leftover.trim().isEmpty()) {
+                searchName(leftover.trim());
+                return;
+            }
+        }    
 
     System.out.print("Enter name to search: ");
     String name = input.nextLine().trim();
-
-    // 1. Search applicants (sorted list)
-    applicants = MergeSort.sort(applicants);
-    int index = BinarySearch.search(applicants, name, 0, applicants.size() - 1);
-
-    if (index != -1) {
-        System.out.println("\nFound in applicants:");
-        System.out.println(applicants.get(index));
-        return;
+    
+         searchName(name);
     }
+   
+private static void searchName(String name) {
 
+        // 1. Search applicants list
+        applicants = MergeSort.sort(applicants);
+        int index = BinarySearch.search(applicants, name, 0, applicants.size() - 1);
+
+        if (index != -1) {
+            System.out.println("\nFound in applicants:");
+            System.out.println(applicants.get(index));
+            return;
+        }
+
+ 
     // 2. Search employees (manually added or tree-generated)
     for (Employee e : employees) {
         if (e.getName().equalsIgnoreCase(name)) {
@@ -172,21 +187,42 @@ public class JAVAprojCA_2 {
         System.out.println("\nEmployee added:");
         System.out.println(emp);
     }
+private static void searchEmployee() {
 
+    if (employees.isEmpty()) {
+        System.out.println("No employees added yet.");
+        return;
+    }
+
+    System.out.print("Enter employee name: ");
+    String name = input.nextLine().trim();
+
+    for (Employee e : employees) {
+        if (e.getName().equalsIgnoreCase(name)) {
+            System.out.println("\nEmployee found:");
+            System.out.println(
+                e.getName() + " | " +
+                e.getManagerType() + " | " +
+                e.getDepartment()
+            );
+            return;
+        }
+    }
+
+    System.out.println("\nEmployee not found.");
+}
     // -----------------------------
     // BUILD EMPLOYEE TREE (FIRST 20 APPLICANTS)
     // -----------------------------
     private static void buildTree() {
-        if (applicants.size() < 20) {
-            System.out.println("You need at least 20 applicants.");
+        if (employees.isEmpty()){
+            System.out.println("No employees available to build a tree.");
             return;
         }
 
         EmployeeTree tree = new EmployeeTree();
-
-        for (int i = 0; i < 20; i++) {
-            Employee e = createRandomEmployee(applicants.get(i));
-            employees.add(e);
+//Adding Employees into the Organisation tree
+        for (Employee e : employees){
             tree.insert(e);
         }
 
