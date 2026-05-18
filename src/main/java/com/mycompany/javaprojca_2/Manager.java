@@ -8,22 +8,18 @@ package com.mycompany.javaprojca_2;
  *
  * @author gondo
  */
-public class Manager {
-    
-    private String managerType;
 
-    public Manager(String managerType) {
-        this.managerType = managerType;
+        
+    public enum Manager {
+        CEO,
+        MANAGING_DIRECTOR,
+        DIRECTOR,
+        ADMINISTRATOR,
+        SENIOR_MANAGER,
+        ASSISTANT_MANAGER,
+        IT_TECHNIANS,
+        HR,
+        TEAM_LEAD,
+        TELLER
     }
-
-    public String getManagerType() {
-        return managerType;
-    }
-
-    @Override
-    public String toString() {
-        return managerType;
-    }
-}
-            
 
