@@ -15,7 +15,7 @@ import java.util.Scanner;
  */
 public class JAVAprojCA_2 {
 
-    static List<String> applicants = new ArrayList<>();
+    static List<Applicants> applicants = new ArrayList<>();
     static List<Employee> employees = new ArrayList<>();
     static Scanner input = new Scanner(System.in);
 
@@ -53,250 +53,189 @@ public class JAVAprojCA_2 {
         } while (option != MenuOption.EXIT);
     }
 
-    // -----------------------------
-    // LOAD APPLICANTS (FIRST + LAST NAME,MANAGER TYPE AND DEPARTMENT)
-    // -----------------------------
+    // ============================
+    // LOAD APPLICANTS
+    // ============================
     private static void loadApplicants() {
-           try {
-        File file = new File("Applicants_Form.txt");
-        Scanner reader = new Scanner(file);
+        try {
+            File file = new File("Applicants_Form.txt");
+            Scanner reader = new Scanner(file);
 
-        boolean isFirstLine = true;
+            boolean isFirstLine = true;
 
-        while (reader.hasNextLine()) {
-            String line = reader.nextLine().trim();
-            if (line.isEmpty()) continue;
+            while (reader.hasNextLine()) {
+                String line = reader.nextLine().trim();
+                if (line.isEmpty()) continue;
 
-            // Skip header row
-            if (isFirstLine) {
-                isFirstLine = false;
-                continue;
+                if (isFirstLine) {
+                    isFirstLine = false;
+                    continue;
+                }
+
+                String[] parts = line.split(",");
+                if (parts.length < 9) continue;
+
+                String firstName = parts[0].trim();
+                String lastName = parts[1].trim();
+                String jobTitle = parts[7].trim();
+                String dept = parts[5].trim();
+
+                String fullName = firstName + " " + lastName;
+
+                // MAP JOB TITLE → ManagerType
+                ManagerType mType = mapManagerType(jobTitle);
+
+                // MAP DEPARTMENT → DepartmentType
+                DepartmentType dType = mapDepartmentType(dept);
+
+                applicants.add(new Applicants(fullName, mType.name(), dType.name()));
             }
 
-            String[] parts = line.split(",");
-            if (parts.length < 2) continue;
+            System.out.println("Applicants loaded successfully.");
 
-            String fullName = parts[0].trim() + " " + parts[1].trim();
-            applicants.add(fullName);
+        } catch (Exception e) {
+            System.out.println("Error reading file: " + e.getMessage());
         }
-
-        System.out.println("Applicants loaded successfully.");
-
-    } catch (Exception e) {
-        System.out.println("Error reading file.");
     }
-}
 
-    // -----------------------------
-    // SORT APPLICANTS + DISPLAY CLEAN OUTPUT
-    // -----------------------------
+    // ============================
+    // SORT APPLICANTS
+    // ============================
     private static void sortApplicants() {
         if (applicants.isEmpty()) {
             System.out.println("No applicants loaded.");
             return;
         }
 
-        applicants = MergeSort.sort(applicants);
+        List<String> formatted = new ArrayList<>();
+        for (Applicants a : applicants) {
+            formatted.add(a.getFullName() + " | " + a.getPosition() + " | " + a.getDepartment());
+        }
+
+        formatted = MergeSort.sort(formatted);
 
         System.out.println("\nFirst 20 sorted applicants (Name | Manager | Department):");
-
-        for (int i = 0; i < 20 && i < applicants.size(); i++) {
-            Employee e = createRandomEmployee(applicants.get(i));
-            System.out.println(
-                e.getName() + " | " +
-                e.getManagerType() + " | " +
-                e.getDepartment()
-            );
+        for (int i = 0; i < 20 && i < formatted.size(); i++) {
+            System.out.println((i + 1) + ". " + formatted.get(i));
         }
     }
 
-    // -----------------------------
+    // ============================
     // SEARCH APPLICANT
-    // -----------------------------
-   private static void searchApplicant() {
-       
-   if (input.hasNextLine()) {
-            String leftover = input.nextLine();
-            if (!leftover.trim().isEmpty()) {
-                searchName(leftover.trim());
+    // ============================
+    private static void searchApplicant() {
+        System.out.print("Enter name to search: ");
+        String name = input.nextLine().trim();
+
+        for (Applicants a : applicants) {
+            if (a.getFullName().equalsIgnoreCase(name)) {
+                System.out.println("\nFound:");
+                System.out.println(a.getFullName() + " | " + a.getPosition() + " | " + a.getDepartment());
                 return;
             }
-        }    
+        }
 
-    System.out.print("Enter name to search: ");
-    String name = input.nextLine().trim();
+        System.out.println("Applicant not found.");
+    }
+
+    // ============================
+    // ADD EMPLOYEE
+    // ============================
+   private static void addEmployee() {
+
+    System.out.println("\n=== ADD EMPLOYEE ===");
+
+    // Ask for name
+    System.out.print("Enter full name: ");
+    String fullName = input.nextLine().trim();
     
-         searchName(name);
-    }
-   
-private static void searchName(String name) {
-
-        // 1. Search applicants list
-        applicants = MergeSort.sort(applicants);
-        int index = BinarySearch.search(applicants, name, 0, applicants.size() - 1);
-
-        if (index != -1) {
-            System.out.println("\nFound in applicants:");
-            System.out.println(applicants.get(index));
-            return;
-        }
-
- 
-    // 2. Search employees (manually added or tree-generated)
-    for (Employee e : employees) {
-        if (e.getName().equalsIgnoreCase(name)) {
-            System.out.println("\nFound in employees:");
-            System.out.println(
-                e.getName() + " | " +
-                e.getManagerType() + " | " +
-                e.getDepartment()
-            );
-            return;
+     // Check if applicant exists
+    Applicants found = null;
+    for (Applicants a : applicants) {
+        if (a.getFullName().equalsIgnoreCase(fullName)) {
+            found = a;
+            break;
         }
     }
-
-    System.out.println("\nName not found.");
-}
-
-    // -----------------------------
-    // ADD EMPLOYEE MANUALLY
-    // -----------------------------
-    private static void addEmployee() {
-        String name;
-        
-        while(true){
-        System.out.print("Enter employee name: ");
-        String nameInput = input.nextLine();
-        if (nameInput.isEmpty()) {
-            System.out.println("Name cannot be empty.");
-            continue;
-        }
-        if(!nameInput.matches("[A-Za-z ]+")) {
-            System.out.println("Invalid name. Only letters and spaces allowed.");
-            continue;
-        }
-        name = nameInput;
-        break;
-        }
-        System.out.println("Select Manager Type:");
-        Manager[] managers = Manager.values();
-        for (int i = 0; i < managers.length; i++) {
-            System.out.println((i + 1) + ". " + managers[i]);
-        }
-        int mChoice = getValidatedChoice(managers.length);
-        Manager manager = managers[mChoice - 1];
-        
-        Department dept;
-        if(manager == Manager.CEO){
-            dept = Department.NONE;
-            System.out.println("\nCEO does not require a department");
-        }else{
-        System.out.println("Select Department:");
-        Department[] deps = Department.values();
-        for (int i = 0; i < deps.length; i++) {
-            System.out.println((i + 1) + ". " + deps[i]);
-        }
-        int dChoice = getValidatedChoice(deps.length);
-         dept = deps[dChoice - 1];
-        }
-        
-        Employee emp = new Employee(name, manager, dept);
-        employees.add(emp);
-
-        System.out.println("\nEmployee added:");
-        System.out.println(emp);
-    }
-  
-private static void searchEmployee() {
-
-    if (employees.isEmpty()) {
-        System.out.println("No employees added yet.");
+if (found == null) {
+        System.out.println(" Applicant not found in the list. You can only add employees from the sorted applicants.");
         return;
     }
+    // Ask for ManagerType
+    System.out.println("\nSelect Manager Type:");
+    int index = 1;
+    for (ManagerType mt : ManagerType.values()) {
+        System.out.println(index + ". " + mt);
+        index++;
+    }
+    System.out.print("Enter choice: ");
+    int mChoice = getIntInput();
+    ManagerType mType = ManagerType.values()[mChoice - 1];
 
-    System.out.print("Enter employee name: ");
-    String name = input.nextLine().trim();
+    // Ask for DepartmentType
+    System.out.println("\nSelect Department:");
+    index = 1;
+    for (DepartmentType dt : DepartmentType.values()) {
+        System.out.println(index + ". " + dt);
+        index++;
+    }
+    System.out.print("Enter choice: ");
+    int dChoice = getIntInput();
+    DepartmentType dType = DepartmentType.values()[dChoice - 1];
 
-    for (Employee e : employees) {
-        if (e.getName().equalsIgnoreCase(name)) {
-            System.out.println("\nEmployee found:");
-            System.out.println(
-                e.getName() + " | " +
-                e.getManagerType() + " | " +
-                e.getDepartment()
-            );
-            return;
+    // Create objects
+    Manager manager = new Manager(fullName, mType);
+    Department department = new Department(dType.name(), dType);
+
+    Employee emp = new Employee(fullName, manager, department);
+    employees.add(emp);
+
+    System.out.println("\nEmployee added:");
+    System.out.println(emp);
+}
+
+    // ============================
+    // SEARCH EMPLOYEE
+    // ============================
+    private static void searchEmployee() {
+        System.out.print("Enter employee name: ");
+        String name = input.nextLine().trim();
+
+        for (Employee e : employees) {
+            if (e.getName().equalsIgnoreCase(name)) {
+                System.out.println("\nEmployee found:");
+                System.out.println(e);
+                return;
+            }
         }
+
+        System.out.println("Employee not found.");
     }
 
-    System.out.println("\nEmployee not found.");
-}
-    // -----------------------------
-    // BUILD EMPLOYEE TREE (FIRST 20 APPLICANTS)
-    // -----------------------------
+    // ============================
+    // BUILD TREE
+    // ============================
     private static void buildTree() {
-        if (employees.isEmpty()){
-            System.out.println("No employees available to build a tree.");
+        if (employees.size() < 20) {
+            System.out.println("You must have at least 20 employees to build the hierarchy tree.");
             return;
         }
 
         EmployeeTree tree = new EmployeeTree();
-//Adding Employees into the Organisation tree
-        for (Employee e : employees){
-            tree.insert(e);
+
+        for (int i = 0; i < 20; i++) {
+            tree.insert(employees.get(i));
         }
 
-        System.out.println("\n===== EMPLOYEE TREE (LEVEL ORDER) =====");
+        System.out.println("\n===== EMPLOYEE TREE =====");
         tree.displayLevelOrder();
-
-        System.out.println("\nTree Height: " + tree.getHeight());
+        System.out.println("Tree Height: " + tree.getHeight());
         System.out.println("Total Nodes: " + tree.getNodeCount());
     }
 
-    // -----------------------------
-    // VIEW ALL EMPLOYEES
-    // -----------------------------
-    private static void viewAllEmployees() {
-        if (employees.isEmpty()) {
-            System.out.println("No employees added yet.");
-            return;
-        }
-
-        System.out.println("\n===== ALL EMPLOYEES =====");
-        for (Employee e : employees) {
-            System.out.println(
-                e.getName() + " | " +
-                e.getManagerType() + " | " +
-                e.getDepartment()
-            );
-        }
-    }
-
-    // -----------------------------
-    // HELPER: CREATE RANDOM EMPLOYEE
-    // -----------------------------
-    private static Employee createRandomEmployee(String name) {
-        Manager[] managers = Manager.values();
-        Department[] departments = Department.values();
-
-        Manager randomManager = managers[(int)(Math.random() * managers.length)];
-        Department randomDept = departments[(int)(Math.random() * departments.length)];
-
-        return new Employee(name, randomManager, randomDept);
-    }
-
-    // -----------------------------
+    // ============================
     // INPUT VALIDATION
-    // -----------------------------
-    private static int getValidatedChoice(int max) {
-        int choice;
-        while (true) {
-            choice = getIntInput();
-            if (choice >= 1 && choice <= max) return choice;
-            System.out.println("Invalid choice. Try again.");
-        }
-    }
-
+    // ============================
     private static int getIntInput() {
         while (true) {
             try {
@@ -305,5 +244,35 @@ private static void searchEmployee() {
                 System.out.println("Invalid number. Try again.");
             }
         }
+    }
+
+    // ============================
+    // MAPPING METHODS
+    // ============================
+    private static ManagerType mapManagerType(String job) {
+        job = job.toLowerCase();
+
+        if (job.contains("senior manager")) return ManagerType.SENIOR_MANAGER;
+        if (job.contains("assistant manager")) return ManagerType.ASSISTANT_MANAGER;
+        if (job.contains("manager")) return ManagerType.DIRECTOR;
+        if (job.contains("developer") || job.contains("qa") || job.contains("full-stack"))
+            return ManagerType.IT_TECHNICIAN;
+        if (job.contains("hr")) return ManagerType.HR_ASSISTANT;
+        if (job.contains("clerk") || job.contains("bookkeeper"))
+            return ManagerType.ADMINISTRATOR;
+
+        return ManagerType.ASSISTANT_MANAGER;
+    }
+
+    private static DepartmentType mapDepartmentType(String dept) {
+        dept = dept.toLowerCase();
+
+        if (dept.contains("it")) return DepartmentType.IT;
+        if (dept.contains("customer")) return DepartmentType.CUSTOMER_SERVICE;
+        if (dept.contains("finance")) return DepartmentType.FINANCE;
+        if (dept.contains("account")) return DepartmentType.ACCOUNTS;
+        if (dept.contains("hr")) return DepartmentType.HR;
+
+        return DepartmentType.NONE;
     }
 }
