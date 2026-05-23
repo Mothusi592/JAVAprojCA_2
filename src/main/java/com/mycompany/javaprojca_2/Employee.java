@@ -9,7 +9,7 @@ package com.mycompany.javaprojca_2;
  * @author gondo
  */
 public class Employee {
-   
+
     private String name;
     private Manager manager;
     private Department department;
@@ -32,9 +32,23 @@ public class Employee {
         return department;
     }
 
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public void setManager(Manager manager) {
+        this.manager = manager;
+    }
+
+    public void setDepartment(Department department) {
+        this.department = department;
+    }
+
     @Override
     public String toString() {
-        return name + " | " + manager + " | " + department;
+        return name + " | " 
+                + manager.getType() + " | " 
+                + department.getDepartmentType();
     }
 }
     

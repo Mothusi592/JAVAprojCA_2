@@ -8,14 +8,14 @@ package com.mycompany.javaprojca_2;
  *
  * @author gondo
  */
-public class TreeNode {
-     Employee data;
-     TreeNode left;
-     TreeNode right;
-
-    public TreeNode(Employee data) {
-        this.data = data;
-        
-    }
+public enum DepartmentType {
+   
+    CEO,
+    IT,
+    CUSTOMER_SERVICE,
+    FINANCE,
+    FOREIGN_EXCHANGE,
+    ACCOUNTS,
+    HR,
     
 }

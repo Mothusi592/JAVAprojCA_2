@@ -11,59 +11,118 @@ import java.util.Queue;
  *
  * @author gondo
  */
+/**
+ * EmployeeTree handles the binary tree presentation and hierarchy
+ * of Employees, employees are added using the level order
+ */
+
 public class EmployeeTree {
 
-    static class Node {
-        Employee employee;
-        Node left, right;
+    private TreeNode root;
 
-        Node(Employee employee) {
-            this.employee = employee;
-        }
-    }
-
-    private Node root;
-
+    // ============================
+    // INSERT USING LEVEL ORDER
+    // ============================
     public void insert(Employee employee) {
-        Node newNode = new Node(employee);
+        TreeNode newNode = new TreeNode(employee);
 
         if (root == null) {
             root = newNode;
             return;
         }
 
-        Queue<Node> queue = new LinkedList<>();
+        Queue<TreeNode> queue = new LinkedList<>();
         queue.add(root);
 
         while (!queue.isEmpty()) {
-            Node temp = queue.poll();
+            TreeNode current = queue.poll();
 
-            if (temp.left == null) {
-                temp.left = newNode;
+            if (current.left == null) {
+                current.left = newNode;
                 return;
-            } else queue.add(temp.left);
+            } else queue.add(current.left);
 
-            if (temp.right == null) {
-                temp.right = newNode;
+            if (current.right == null) {
+                current.right = newNode;
                 return;
-            } else queue.add(temp.right);
+            } else queue.add(current.right);
         }
     }
 
+    // ============================
+    // LEVEL ORDER DISPLAY (FLAT LIST)
+    // ============================
     public void displayLevelOrder() {
-        if (root == null) return;
+        if (root == null) {
+            System.out.println("Tree is empty.");
+            return;
+        }
 
-        Queue<Node> queue = new LinkedList<>();
+        Queue<TreeNode> queue = new LinkedList<>();
         queue.add(root);
 
         while (!queue.isEmpty()) {
-            Node temp = queue.poll();
-            System.out.println(temp.employee);
+            TreeNode current = queue.poll();
+            System.out.println(current.data);
 
-            if (temp.left != null) queue.add(temp.left);
-            if (temp.right != null) queue.add(temp.right);
+            if (current.left != null) queue.add(current.left);
+            if (current.right != null) queue.add(current.right);
         }
+    }
+
+    // ============================
+    // HIERARCHY DISPLAY (LEVEL ORDER WITH LEVEL GROUPING)
+    // ============================
+    public void displayHierarchy() {
+        if (root == null) {
+            System.out.println("Tree is empty.");
+            return;
+        }
+
+        System.out.println("\n===== EMPLOYEE HIERARCHY (LEVEL ORDER) =====");
+
+        Queue<TreeNode> queue = new LinkedList<>();
+        queue.add(root);
+
+        int level = 0;
+
+        while (!queue.isEmpty()) {
+            int levelSize = queue.size();
+            System.out.println("\nLEVEL " + level + ":");
+
+            for (int i = 0; i < levelSize; i++) {
+                TreeNode current = queue.poll();
+                System.out.println("  - " + current.data);
+
+                if (current.left != null) queue.add(current.left);
+                if (current.right != null) queue.add(current.right);
+            }
+
+            level++;
+        }
+    }
+
+    // ============================
+    // HEIGHT OF TREE
+    // ============================
+    public int getHeight() {
+        return height(root);
+    }
+
+    private int height(TreeNode node) {
+        if (node == null) return 0;
+        return 1 + Math.max(height(node.left), height(node.right));
+    }
+
+    // ============================
+    // COUNT NODES
+    // ============================
+    public int getNodeCount() {
+        return count(root);
+    }
+
+    private int count(TreeNode node) {
+        if (node == null) return 0;
+        return 1 + count(node.left) + count(node.right);
     }
 }
-    
-

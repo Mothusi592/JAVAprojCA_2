@@ -10,16 +10,34 @@ package com.mycompany.javaprojca_2;
  */
 
         
-    public enum Manager {
-        CEO,
-        MANAGING_DIRECTOR,
-        DIRECTOR,
-        ADMINISTRATOR,
-        SENIOR_MANAGER,
-        ASSISTANT_MANAGER,
-        IT_TECHNIANS,
-        HR,
-        TEAM_LEAD,
-        TELLER
+   public class Manager {
+
+    private String name;
+    private ManagerType managerType;
+
+    public Manager(String name, ManagerType managerType) {
+        this.name = name;
+        this.managerType = managerType;
     }
 
+    public String getName() {
+        return name;
+    }
+
+    public ManagerType getType() {
+        return managerType;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public void setManagerType(ManagerType managerType) {
+        this.managerType = managerType;
+    }
+
+    @Override
+    public String toString() {
+        return name + " (" + managerType + ")";
+    }
+}
